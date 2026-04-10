@@ -1,0 +1,46 @@
+pip install gensim transformersfrom gensim.models import KeyedVectors
+
+# Load pre-trained Word2Vec (no need for GloVe conversion)
+import gensim.downloader as api
+model = api.load("word2vec-google-news-300")
+
+# 1. Get similar words
+print("Similar words for 'king':")
+print(model.most_similar("king", topn=10))
+print()
+
+# 2. Original prompt
+original_prompt = "Explain the importance of vaccinations in healthcare."
+
+# 3. Key terms
+key_terms = ["vaccinations", "healthcare"]
+
+# 4. Find similar words
+similar_terms = []
+for term in key_terms:
+    if term in model.key_to_index:
+        words = [w for w, _ in model.most_similar(term, topn=3)]
+        similar_terms.extend(words)
+
+# Remove duplicates
+similar_terms = list(set(similar_terms))
+
+# 5. Enrich prompt
+if similar_terms:
+    enriched_prompt = original_prompt + " Consider: " + ", ".join(similar_terms)
+else:
+    enriched_prompt = original_prompt
+
+# 6. Print prompts
+print("Original Prompt:")
+print(original_prompt)
+print()
+
+print("Enriched Prompt:")
+print(enriched_prompt)
+print()
+
+# 7. (Simple comparison without API)
+print("---- OUTPUT COMPARISON ----")
+print("Original Prompt → General explanation")
+print("Enriched Prompt → More detailed with related terms like:", similar_terms)
